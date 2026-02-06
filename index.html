@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>7 Years | Our Story</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600&family=Playfair+Display:ital,wght@0,400;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    
+    <style>
+        :root {
+            --night-blue: #020617;
+            --accent-cyan: #22d3ee;
+            --silver: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--night-blue);
+            color: var(--silver);
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            overflow-y: hidden; 
+        }
+
+        /* Frosted Glass Passcode Screen */
+        #passcode-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 6, 23, 0.8); /* Semi-transparent */
+            backdrop-filter: blur(15px); /* Frost effect */
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 10000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; transition: 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #pass-input {
+            background: transparent; border: none; border-bottom: 2px solid var(--accent-cyan);
+            color: var(--accent-cyan); text-align: center; font-size: 2.5rem;
+            width: 180px; outline: none; font-family: 'Montserrat'; letter-spacing: 12px;
+            margin: 20px 0;
+        }
+
+        /* Star Background */
+        #star-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute; background: white; border-radius: 50%;
+            animation: twinkle var(--duration) infinite ease-in-out;
+        }
+
+        @keyframes twinkle { 
+            0%, 100% { opacity: 0.3; transform: scale(1); } 
+            50% { opacity: 1; transform: scale(1.4); } 
+        }
+
+        #lock-screen {
+            position: relative; z-index: 10;
+            height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+        }
+
+        .moon-container {
+            position: relative; z-index: 10;
+            transition: transform 2.5s cubic-bezier(0.7, 0, 0.3, 1), opacity 2s;
+        }
+
+        .moon {
+            width: 160px; height: 160px;
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%, #cbd5e1 40%, #94a3b8 100%);
+            border-radius: 50%; box-shadow: 0 0 80px rgba(255, 255, 255, 0.3);
+            position: relative; overflow: hidden;
+            animation: moonPulse 4s infinite ease-in-out;
+        }
+
+        .moon-crater { position: absolute; background: rgba(0,0,0,0.08); border-radius: 50%; }
+
+        @keyframes moonPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .zoom-active { transform: scale(60); opacity: 0; pointer-events: none; }
+
+        .btn-unlock {
+            background: transparent; border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan); padding: 15px 40px; border-radius: 50px;
+            font-weight: 600; cursor: pointer; margin-top: 30px; transition: 0.3s;
+            position: relative; z-index: 21;
+        }
+
+        .btn-unlock:disabled { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.2); cursor: not-allowed; }
+
+        /* Improved Popup Message */
+        #pop-message {
+            position: absolute; bottom: -60px; left: 50%; transform: translateX(-50%) translateY(-10px);
+            width: 280px; font-size: 0.85rem; color: var(--accent-cyan);
+            opacity: 0; transition: all 0.5s ease; font-style: italic; pointer-events: none;
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.4);
+        }
+
+        .pop-show { opacity: 1 !important; transform: translateX(-50%) translateY(0) !important; }
+
+        #message-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; justify-content: center; align-items: center; z-index: 100;
+        }
+
+        .reveal-text {
+            font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.2rem;
+            color: var(--silver); text-align: center; opacity: 0;
+            transform: translateY(20px); transition: 1.5s ease;
+        }
+
+        .text-show { opacity: 1 !important; transform: translateY(0) !important; }
+
+        #main-content { position: relative; z-index: 10; display: none; padding: 20px; box-sizing: border-box; }
+
+        .glass-card {
+            background: var(--glass); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 25px; padding: 15px; margin: 0 auto 40px;
+            max-width: 500px; text-align: center;
+        }
+
+        .glass-card img { width: 100%; border-radius: 15px; max-height: 550px; object-fit: contain; }
+
+        #nav-dock {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px); border-radius: 30px; 
+            display: none; justify-content: space-around; padding: 12px; z-index: 9999;
+        }
+    </style>
+</head>
+<body onclick="handleEarlyClick()">
+
+    <div id="passcode-screen">
+        <h2 style="font-family: 'Playfair Display'; color: var(--silver); letter-spacing: 2px;">Enter Secret Code</h2>
+        <input type="password" id="pass-input" placeholder="****" maxlength="4" autofocus>
+        <p id="pass-error" style="color:#ef4444; font-size:0.8rem; margin-top:5px; opacity:0; transition: 0.3s;">Try again, my love. ❤️</p>
+        <button onclick="checkPasscode(event)" class="btn-unlock" style="margin-top:10px;">Access</button>
+    </div>
+
+    <div id="star-container"></div>
+
+    <div id="lock-screen">
+        <div class="moon-container" id="moon-box">
+            <div class="moon">
+                <div class="moon-crater" style="width: 30px; height: 30px; top: 20%; left: 20%;"></div>
+                <div class="moon-crater" style="width: 20px; height: 20px; top: 60%; left: 50%;"></div>
+                <div class="moon-crater" style="width: 15px; height: 15px; top: 40%; left: 70%;"></div>
+            </div>
+        </div>
+        
+        <h1 id="lock-title" style="font-family: 'Playfair Display'; margin-top: 30px;">Our Story</h1>
+        <div id="timer" style="letter-spacing: 4px; color: var(--accent-cyan); margin: 20px 0;">--:--:--:--</div>
+        
+        <div style="position: relative;">
+            <button id="unlock-btn" class="btn-unlock" disabled onclick="triggerSequence(event)">Unlock Memories</button>
+            <div id="pop-message">Patience, my love! ❤️ The moon hasn't aligned yet...</div>
+        </div>
+    </div>
+
+    <div id="message-overlay">
+        <h1 id="intro-text" class="reveal-text"></h1>
+    </div>
+
+    <div id="main-content">
+        <header style="text-align: center; padding: 60px 0 40px;">
+            <h1 style="font-family: 'Playfair Display'; font-size: 2.5rem; font-style: italic;">Happy Anniversary</h1>
+            <p style="letter-spacing: 5px; opacity: 0.6; font-size: 0.8rem;">7 BEAUTIFUL YEARS</p>
+        </header>
+
+        <div class="glass-card" data-aos="fade-up"><img src="year 1.jpg" alt="Year 1"><div style="margin-top:20px;"><h3>Year One</h3><p>Where it all started. I knew even then.</p></div></div>
+        <div class="glass-card" data-aos="fade-up"><img src="year2.jpg" alt="Year 2"><div style="margin-top:20px;"><h3>Year Two</h3><p>Building our foundation.</p></div></div>
+        <div class="glass-card" data-aos="fade-up"><img src="year3.jpg" alt="Year 3"><div style="margin-top:20px;"><h3>Year Three</h3><p>Through every challenge.</p></div></div>
+        <div class="glass-card" data-aos="fade-up"><img src="year4.jpg" alt="Year 4"><div style="margin-top:20px;"><h3>Year Four</h3><p>Stronger than ever.</p></div></div>
+        <div class="glass-card" data-aos="fade-up"><img src="year5.jpg" alt="Year 5"><div style="margin-top:20px;"><h3>Year Five</h3><p>Half a decade of pure happiness.</p></div></div>
+        <div class="glass-card" data-aos="fade-up"><img src="year6.jpg" alt="Year 6"><div style="margin-top:20px;"><h3>Year Six</h3><p>Making the best memories.</p></div></div>
+        <div class="glass-card" data-aos="fade-up"><img src="year7.jpg" alt="Year 7"><div style="margin-top:20px;"><h3>Year Seven</h3><p>2,557 days later, and I'd still choose you.</p></div></div>
+
+        <div style="text-align: center; padding: 100px 0;" data-aos="zoom-in">
+            <h2 style="font-family: 'Playfair Display';">To be continued...</h2>
+            <p id="final-note" style="display:none; padding: 20px; line-height: 1.8; max-width: 500px; margin: 0 auto; white-space: pre-wrap;">
+Dear Baby,
+These 7 years have been the greatest adventure of my life. You are my home, my best friend, and my forever.
+Happy Anniversary!
+            </p>
+            <button class="btn-unlock" id="read-note-btn" onclick="showNote()">Read My Note</button>
+        </div>
+    </div>
+
+    <nav id="nav-dock">
+        <div style="color:white; text-align:center;"><b>2,557</b><br><small>DAYS</small></div>
+        <button onclick="toggleMusic()" style="background:none; border:none; color:white; cursor:pointer;"><b>♫</b><br><small>MUSIC</small></button>
+        <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" style="background:none; border:none; color:white; cursor:pointer;"><b>❤</b><br><small>NOTE</small></button>
+    </nav>
+
+    <audio id="bg-music" loop preload="auto"><source src="music.mp3" type="audio/mpeg"></audio>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        // Passcode Logic
+        function checkPasscode(e) {
+            if(e) e.stopPropagation();
+            const input = document.getElementById('pass-input').value;
+            // Password is set to 1302
+            if(input === "2907") {
+                document.getElementById('passcode-screen').style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById('passcode-screen').style.display = "none";
+                }, 1200);
+            } else {
+                const err = document.getElementById('pass-error');
+                err.style.opacity = "1";
+                document.getElementById('pass-input').value = "";
+                setTimeout(() => { err.style.opacity = "0"; }, 2000);
+            }
+        }
+
+        // Enter key for passcode
+        document.getElementById('pass-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPasscode();
+        });
+
+        // Stars
+        const starContainer = document.getElementById('star-container');
+        for (let i = 0; i < 200; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 2 + 1; 
+            star.style.width = size + 'px'; star.style.height = size + 'px';
+            star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%';
+            star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
+            starContainer.appendChild(star);
+        }
+
+        // Timer Logic
+        const target = new Date("Feb 1, 2026 00:00:00").getTime();
+        const unlockBtn = document.getElementById('unlock-btn');
+
+        setInterval(() => {
+            const now = new Date().getTime();
+            const diff = target - now;
+            if (diff <= 0) {
+                unlockBtn.disabled = false;
+                document.getElementById('timer').innerHTML = "IT'S TIME! ❤️";
+            } else {
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                document.getElementById('timer').innerHTML = `${d}d ${h}h ${m}m ${s}s`;
+            }
+        }, 1000);
+
+        // Click handler for popup
+        function handleEarlyClick() {
+            // Only show if passcode screen is gone AND button is still disabled
+            if (document.getElementById('passcode-screen').style.display === 'none' && unlockBtn.disabled) {
+                const pop = document.getElementById('pop-message');
+                pop.classList.add('pop-show');
+                setTimeout(() => { pop.classList.remove('pop-show'); }, 2500);
+            }
+        }
+
+        // Main Animation Sequence
+        function triggerSequence(event) {
+            event.stopPropagation();
+            document.getElementById('bg-music').play().catch(() => {});
+            document.getElementById('moon-box').classList.add('zoom-active');
+            document.getElementById('lock-title').style.opacity = '0';
+            document.getElementById('timer').style.opacity = '0';
+            unlockBtn.style.opacity = '0';
+
+            setTimeout(() => {
+                document.getElementById('lock-screen').style.display = 'none';
+                const overlay = document.getElementById('message-overlay');
+                const introText = document.getElementById('intro-text');
+                overlay.style.display = 'flex';
+                
+                introText.innerText = "Welcome Baby";
+                setTimeout(() => introText.classList.add('text-show'), 100);
+
+                setTimeout(() => {
+                    introText.classList.remove('text-show');
+                    setTimeout(() => {
+                        introText.innerText = "Happiest 7th Anniversary";
+                        introText.classList.add('text-show');
+                        setTimeout(() => {
+                            overlay.style.display = 'none';
+                            document.getElementById('main-content').style.display = 'block';
+                            document.getElementById('nav-dock').style.display = 'flex';
+                            document.body.style.overflowY = 'auto';
+                            document.documentElement.style.overflowY = 'auto';
+                            AOS.init({ duration: 1000, once: true });
+                            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                        }, 3500);
+                    }, 1500);
+                }, 3000);
+            }, 2200);
+        }
+
+        function showNote() {
+            document.getElementById('final-note').style.display = 'block';
+            document.getElementById('read-note-btn').style.display = 'none';
+            AOS.refresh();
+        }
+
+        function toggleMusic() {
+            const m = document.getElementById('bg-music');
+            m.paused ? m.play() : m.pause();
+        }
+    </script>
+</body>
+</html>
